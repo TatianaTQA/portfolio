@@ -1,0 +1,408 @@
+{
+  "info": {
+    "_postman_id": "80e8aadd-6f71-40b8-b928-d5fe68844bc5",
+    "name": "Dummy_API(Turbina Tania)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "26187417"
+  },
+  "item": [
+    {
+      "name": "USER",
+      "item": [
+        {
+          "name": "List of Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/user",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "user"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create New User",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set(\"dynamic_firstName\", \"Tania\" + Math.floor(Math.random() * 100));",
+                  "pm.collectionVariables.set(\"dynamic_lastName\", \"Sun\" + Math.floor(Math.random() * 100));",
+                  "pm.collectionVariables.set(\"dynamic_email\", \"ZxC\" + Math.floor(Math.random() * 100) + \"@my.pl\");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log(pm.response.json())",
+                  "var userID = pm.response.json().id; ",
+                  "console.log(\"ID пользователя - \" + userID)",
+                  "pm.collectionVariables.set(\"ID_user\", userID);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"firstName\": \"{{dynamic_firstName}}\",\n    \"lastName\": \"{{dynamic_lastName}}\",\n    \"email\": \"{{dynamic_email}}\",\n    \"gender\": \"female\",\n    \"phone\": \"12345678\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/user/create",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "user",
+                "create"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/user/{{ID_user}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "user",
+                "{{ID_user}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"firstName\": \"Tania!\",\n    \"lastName\": \"Sun!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/user/{{ID_user}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "user",
+                "{{ID_user}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/user/{{ID_user}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "user",
+                "{{ID_user}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "POST",
+      "item": [
+        {
+          "name": "Create Post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log(pm.response.json())",
+                  "var postID = pm.response.json().id",
+                  "console.log(\"ID поста - \" + postID)",
+                  "pm.collectionVariables.set(\"ID_post\", postID);",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\"text\": \"Hi! My second post!\",\n\"image\": \"https://www.pinterest.com/pin/1108870739522916873/\",\n\"likes\": 1,\n\"tags\": [\"post\"],\n\"owner\": \"{{ID_user}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/post/create",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "post",
+                "create"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Post by ID_post",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/post/{{ID_post}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "post",
+                "{{ID_post}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Post",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\"text\": \"Hi! My update post!\",\n\"image\": \"https://www.pinterest.com/pin/123/\",\n\"likes\": 2,\n\"tags\": [\"post\", \"like\"],\n\"link\": \"https://app.activenow.io/\",\n\"owner\": \"{{ID_user}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/post/{{ID_post}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "post",
+                "{{ID_post}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Post",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/post/{{ID_post}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "post",
+                "{{ID_post}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "COMMENT",
+      "item": [
+        {
+          "name": "Create Comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log(pm.response.json())",
+                  "var commentID = pm.response.json().id;",
+                  "console.log(\"ID комментария - \" + commentID)",
+                  "pm.collectionVariables.set(\"ID_comment\", commentID);",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\"message\": \"Fantastics1\",\n\"owner\": \"{{ID_user}}\",\n\"post\": \"{{ID_post}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/comment/create",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "comment",
+                "create"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Comment",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/comment/{{ID_comment}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "comment",
+                "{{ID_comment}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "value",
+        "value": "{{app-id}}",
+        "type": "string"
+      },
+      {
+        "key": "key",
+        "value": "app-id",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "ID_post",
+      "value": ""
+    },
+    {
+      "key": "ID_comment",
+      "value": ""
+    },
+    {
+      "key": "ID_user",
+      "value": ""
+    },
+    {
+      "key": "dynamic_firstName",
+      "value": ""
+    },
+    {
+      "key": "dynamic_lastName",
+      "value": ""
+    },
+    {
+      "key": "dynamic_email",
+      "value": ""
+    }
+  ]
+}
