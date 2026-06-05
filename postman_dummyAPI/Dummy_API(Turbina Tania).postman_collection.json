@@ -11,6 +11,41 @@
       "item": [
         {
           "name": "List of Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Each user has a unique id\", function () {",
+                  "    const users = jsonData.data;",
+                  "    const ids = users.map(user => user.id);",
+                  "    const uniqueIds = new Set(ids);",
+                  "    pm.expect(uniqueIds.size).to.eql(ids.length);",
+                  "});",
+                  "",
+                  "pm.test(\"Each user has all required fields\", function () {",
+                  "const users = jsonData.data;",
+                  "const requiredFields = [\"id\", \"title\", \"firstName\", \"lastName\", \"picture\"];",
+                  "for (let user of users) {",
+                  "    for (let field of requiredFields) {",
+                  "        pm.expect(user).to.have.property(field);",
+                  "        }",
+                  "    }",
+                  "    });",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -46,10 +81,55 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(pm.response.json())",
-                  "var userID = pm.response.json().id; ",
-                  "console.log(\"ID пользователя - \" + userID)",
-                  "pm.collectionVariables.set(\"ID_user\", userID);"
+                  "let responseJson = pm.response.json();",
+                  "let requestBody = JSON.parse(pm.request.body.raw);",
+                  "",
+                  "console.log(responseJson);",
+                  "var userID = responseJson.id; ",
+                  "console.log(\"ID пользователя - \" + userID);",
+                  "pm.collectionVariables.set(\"ID_user\", userID);",
+                  "",
+                  "// 1. Статус код 200",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Email in response matches email from request body\", function () {",
+                  "    const requestEmail = requestBody.email;",
+                  "     pm.expect(responseJson.email.toLowerCase()).to.eql(requestEmail.toLowerCase());",
+                  "});",
+                  "",
+                  "",
+                  "pm.test(\"Response contains non-empty id\", function () {",
+                  "    pm.expect(responseJson).to.have.property(\"id\");",
+                  "    pm.expect(responseJson.id).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"firstName in response matches request body\", function () {",
+                  "    pm.expect(responseJson.firstName).to.eql(requestBody.firstName);",
+                  "});",
+                  "",
+                  "pm.test(\"lastName in response matches request body\", function () {",
+                  "    pm.expect(responseJson.lastName).to.eql(requestBody.lastName);",
+                  "});",
+                  "",
+                  "pm.test(\"gender in response matches request body\", function () {",
+                  "    pm.expect(responseJson.gender).to.eql(requestBody.gender);",
+                  "});",
+                  "",
+                  "pm.test(\"phone in response matches request body\", function () {",
+                  "    pm.expect(responseJson.phone).to.eql(requestBody.phone);",
+                  "});",
+                  "",
+                  "pm.test(\"Response contains registerDate and updatedDate\", function () {",
+                  "    pm.expect(responseJson).to.have.property(\"registerDate\");",
+                  "    pm.expect(responseJson).to.have.property(\"updatedDate\");",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Type is application/json\", function () {",
+                  "    pm.response.to.have.header(\"Content-Type\");",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -84,6 +164,34 @@
         },
         {
           "name": "Get User by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let responseBody = pm.response.json();",
+                  "let userId = pm.variables.get(\"ID_user\");",
+                  "",
+                  "console.log(\"User ID from URL:\", userId);",
+                  "console.log(\"User ID from response:\", responseBody.id);",
+                  "",
+                  "pm.test(\"Response ID matches the ID sent in the URL\", function () {",
+                  "    pm.expect(responseBody.id).to.eql(userId);",
+                  "});",
+                  "",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -102,6 +210,46 @@
         },
         {
           "name": "Update User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let respBody = pm.response.json();",
+                  "let respBodyId = respBody.id;",
+                  "let reqBody = JSON.parse(pm.request.body.raw);",
+                  "let reqURLId = pm.variables.get(\"ID_user\");",
+                  "",
+                  "console.log(reqURLId)",
+                  "console.log(respBodyId)",
+                  "",
+                  "pm.test(\"Response body id matches request body id\", function () {",
+                  "    pm.expect(respBodyId).to.eql(reqURLId);",
+                  "    });",
+                  "",
+                  "pm.test(\"Response body first name matches request body first name\", function () {",
+                  "    pm.expect(respBody.firstName).to.eql(reqBody.firstName);",
+                  "    });",
+                  "",
+                  "pm.test(\"Response body last name matches request body last name\", function () {",
+                  "    pm.expect(respBody.lastName).to.eql(reqBody.lastName);",
+                  "    });",
+                  "",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [],
@@ -129,6 +277,32 @@
         },
         {
           "name": "Delete User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let respBody = pm.response.json();",
+                  "let respBodyId = respBody.id;",
+                  "",
+                  "let reqURLId = pm.variables.get(\"ID_user\");",
+                  "",
+                  "pm.test(\"Response body id matches request URL id\", function () {",
+                  "    pm.expect(respBodyId).to.eql(reqURLId);",
+                  "    });",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [],
@@ -157,11 +331,47 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(pm.response.json())",
+                  "let respData = pm.response.json()",
+                  "let reqData = JSON.parse(pm.request.body.raw)",
+                  "console.log(respData)",
+                  "",
                   "var postID = pm.response.json().id",
                   "console.log(\"ID поста - \" + postID)",
                   "pm.collectionVariables.set(\"ID_post\", postID);",
                   "",
+                  "pm.test(\"Text in reqest = Text in response\", function () {",
+                  "    pm.expect(respData.text).to.eql(reqData.text); ",
+                  "    });",
+                  "",
+                  "pm.test(\"Image in reqest = Image in response\", function () {",
+                  "    pm.expect(respData.image).to.eql(reqData.image); ",
+                  "    });",
+                  "",
+                  "pm.test(\"Likes in reqest = Likes in response\", function () {",
+                  "    pm.expect(respData.likes).to.eql(reqData.likes); ",
+                  "    });",
+                  "",
+                  "pm.test(\"Tags in reqest = Tags in response\", function () {",
+                  "    pm.expect(respData.tags).to.eql(reqData.tags); ",
+                  "    })",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
                   ""
                 ],
                 "type": "text/javascript",
@@ -197,6 +407,32 @@
         },
         {
           "name": "Get Post by ID_post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let respData = pm.response.json();",
+                  "",
+                  "",
+                  "let PostId = pm.variables.get(\"ID_post\");",
+                  "",
+                  "pm.test(\"ID Post in reqest = ID Post in response\", function () {",
+                  "    pm.expect(respData.id).to.eql(PostId);",
+                  "});",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -215,6 +451,57 @@
         },
         {
           "name": "Update Post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let respBody = pm.response.json();",
+                  "let reqBody = JSON.parse(pm.request.body.raw);",
+                  "let reqPostId = pm.variables.get(\"ID_post\");",
+                  "",
+                  "",
+                  "pm.test(\"Response Post ID matches request Post ID\", function () {",
+                  "    pm.expect(reqPostId).to.eql(respBody.id);",
+                  "    });",
+                  "",
+                  "pm.test(\"Response image = request image\", function () {",
+                  "    pm.expect(respBody.image).to.eql(reqBody.image);",
+                  "    });",
+                  "",
+                  "pm.test(\"Response text = request text\", function () {",
+                  "    pm.expect(respBody.text).to.eql(reqBody.text);",
+                  "    });",
+                  "",
+                  "pm.test(\"Response tags = request tags\", function () {",
+                  "    pm.expect(respBody.tags).to.eql(reqBody.tags);",
+                  "    });",
+                  "",
+                  "pm.test(\"Response likes = request likes\", function () {",
+                  "    pm.expect(respBody.likes).to.eql(reqBody.likes);",
+                  "    });",
+                  "",
+                  "pm.test(\"Response link = request link\", function () {",
+                  "    pm.expect(respBody.link).to.eql(reqBody.link);",
+                  "    });",
+                  "",
+                  "",
+                  "pm.test(\"Response Owner ID = request Owner ID\", function () {",
+                  "    const ownerID = pm.variables.get(\"ID_user\");",
+                  "    pm.expect(respBody.owner.id).to.eql(ownerID);",
+                  "    });",
+                  "",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [],
@@ -242,6 +529,30 @@
         },
         {
           "name": "Delete Post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let respBody = pm.response.json();",
+                  "let respPostId = respBody.id;",
+                  "",
+                  "let reqPostID = pm.variables.get(\"ID_post\");",
+                  "",
+                  "pm.test(\"Response Post ID matches request URL Post ID\", function () {",
+                  "    pm.expect(respPostId).to.eql(reqPostID);",
+                  "    });",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [],
@@ -270,11 +581,30 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(pm.response.json())",
-                  "var commentID = pm.response.json().id;",
-                  "console.log(\"ID комментария - \" + commentID)",
+                  "const respData = pm.response.json();",
+                  "console.log(respData)",
+                  "const reqData = JSON.parse(pm.request.body.raw);",
+                  "",
+                  "var commentID = respData.id;",
+                  "console.log(\"ID comment - \" + commentID)",
                   "pm.collectionVariables.set(\"ID_comment\", commentID);",
                   "",
+                  "pm.test(\"Response message = request message\", function () {",
+                  "    pm.expect(respData.message).to.eql(reqData.message);",
+                  "});",
+                  "",
+                  "pm.test(\"Response owner ID = Request owner ID\", function () {",
+                  "    const OwnerID = pm.collectionVariables.get(\"ID_user\")",
+                  "    pm.expect(respData.owner.id).to.eql(OwnerID);",
+                  "});",
+                  "",
+                  "pm.test(\"Response post ID = Request post ID\", function () {",
+                  "    pm.expect(respData.post).to.eql(pm.collectionVariables.get(\"ID_post\"));",
+                  "});",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
                   ""
                 ],
                 "type": "text/javascript",
@@ -321,6 +651,30 @@
         },
         {
           "name": "Delete Comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let respBody = pm.response.json();",
+                  "let respCommentId = respBody.id;",
+                  "",
+                  "let reqCommentID = pm.variables.get(\"ID_comment\");",
+                  "",
+                  "pm.test(\"Response Comment ID matches request URL Comment ID\", function () {",
+                  "    pm.expect(respCommentId).to.eql(reqCommentID);",
+                  "    });",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [],
